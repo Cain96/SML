@@ -22,4 +22,4 @@ fun compute s =
 	in
             if rest = nil then result else raise SyntaxError
 	end
-    end;
+end;
