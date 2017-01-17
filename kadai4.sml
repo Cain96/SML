@@ -40,9 +40,9 @@ fun compute s =
                 end
             else raise SyntaxError
     in
-	let
+        let
             val (result,rest) = EXP (separate s)
-	in
+        in
             if rest = nil then result else raise SyntaxError
-	end
-end;
+        end
+    end;
