@@ -1,3 +1,5 @@
+use "lib.sml";
+
 fun compute s =
     let
 	fun EXP nil = raise SyntaxError
