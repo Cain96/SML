@@ -1,5 +1,5 @@
 fun findValue s nil = raise NotDefined 
-    | findValue s (h::t) =
-        if [リストの最初の組 h が対象の s に該当する？]
-            then [対応する値]
-        else [findValue を再帰的に利用してリストの後続を検索];
+    | findValue s (h::t : (string*int) list) =
+        if s = (#1 h) then
+            #2 h
+        else findValue s t;
