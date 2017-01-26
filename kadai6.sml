@@ -2,79 +2,95 @@ use "lib.sml";
 
 fun compute s mapL =
     let
-        fun EXP (nil, f) = raise SyntaxError
-          | EXP (h::t, f) =
+        fun EXP (nil, f, b) = raise SyntaxError
+          | EXP (h::t, f, b) =
             if isInt h then 
-                (toInt h, t, f)
+                (toInt h, t, f, b)
             else if h = "(" then
                 let
                     val f = f + 1
-                    val (v1, t1, f) = EXP (t, f)
-                    val (v2, t2, f) = EXP (t1, f)
+                    val b = true
+                    val (v1, t1, f, b) = EXP (t, f, b)
+                    val (v2, t2, f, b) = EXP (t1, f, b)
                     val f = f - 1
                 in
-                    (v1, t2, f)
+                    (v1, t2, f, b)
                 end
             else if isAlp h then
                 if h = "fact" orelse h = "fibo" then
-                    FUNC (h::t, f)
+                    if b then
+                        FUNC (h::t, f, b)
+                    else
+                        let
+                            val b = false
+                            val h = findValue h mapL
+                        in
+                            (h, t, f, b)
+                        end
                 else
                     let
+                        val b = false
                         val h = findValue h mapL
                     in
-                        (h, t, f)
+                        (h, t, f, b)
                     end
-            else if isOpr h then COMP (h::t, f)
+            else if isOpr h then COMP (h::t, f, b)
             else raise SyntaxError
-    and COMP (nil, f) = raise SyntaxError
-          | COMP (h::t, f) =
+    and COMP (nil, f, b) = raise SyntaxError
+          | COMP (h::t, f, b) =
             if f > 0 then
                 if h = "+" then
                     let
-                        val (v1,t1, f) = EXP (t, f)
-                        val (v2,t2, f) = EXP (t1, f)
+                        val b = false
+                        val (v1,t1, f, b) = EXP (t, f, b)
+                        val (v2,t2, f, b) = EXP (t1, f, b)
                     in
-                        (v1 + v2, t2, f)
+                        (v1 + v2, t2, f, b)
                     end
                 else if h = "-" then
                     let
-                        val (v1,t1, f) = EXP (t, f)
-                        val (v2,t2, f) = EXP (t1, f)
+                        val b = false
+                        val (v1,t1, f, b) = EXP (t, f, b)
+                        val (v2,t2, f, b) = EXP (t1, f, b)
                     in
-                        (v1 - v2, t2, f)
+                        (v1 - v2, t2, f, b)
                     end
                 else if h = "*" then
                     let
-                        val (v1,t1, f) = EXP (t, f)
-                        val (v2,t2, f) = EXP (t1, f)
+                        val b = false
+                        val (v1,t1, f, b) = EXP (t, f, b)
+                        val (v2,t2, f, b) = EXP (t1, f, b)
                     in
-                        (v1 * v2, t2, f)
+                        (v1 * v2, t2, f, b)
                     end
                 else if h = "/" then
                     let
-                        val (v1,t1, f) = EXP (t, f)
-                        val (v2,t2, f) = EXP (t1, f)
+                        val b = false
+                        val (v1,t1, f, b) = EXP (t, f, b)
+                        val (v2,t2, f, b) = EXP (t1, f, b)
                     in
-                        (v1 div v2, t2, f)
+                        (v1 div v2, t2, f, b)
                     end
                 else if h = ")" then
-                    (0 ,t, f)
+                    (0 ,t, f, b)
                 else raise SyntaxError
             else raise SyntaxError
-    and FUNC (nil, f) = raise SyntaxError
-          | FUNC (h::t, f) =
+    and FUNC (nil, f, b) = raise SyntaxError
+          | FUNC (h::t, f, b) =
             if f > 0 then
                 if h = "fact" then
                     let
-                        val (v, t, f) = EXP (t, f)
+                        val b = false
+                        val (v, t, f, b) = EXP (t, f, b)
                     in
-                        (fact v, t, f)
+                        (fact v, t, f, b)
                     end
                 else if h = "fibo" then
                     let
-                        val (v, t, f) = EXP (t, f)
+                        val b = false
+                        val (v, t, f, b) = EXP (t, f, b)
                     in
-                        (fibo v, t, f)
+                        (fibo v, t, f, b)
                     end
                 else raise SyntaxError
             else raise SyntaxError
@@ -85,7 +101,7 @@ fun compute s mapL =
             else findValue s t;
     in
         let
-            val (result,rest, f) = EXP (separate s, 0)
+            val (result,rest, f, b) = EXP (separate s, 0, false)
         in
             if rest = nil andalso f = 0 then result else raise SyntaxError
         end
