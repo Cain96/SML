@@ -7,10 +7,10 @@ fun compute s =
             if isInt h then (toInt h, t, f)
             else if h = "(" then
                 let
-                    val f = true
+                    val f = f + 1
                     val (v1, t1, f) = EXP (t, f)
                     val (v2, t2, f) = EXP (t1, f)
-                    val f = false
+                    val f = f - 1
                 in
                     (v1, t2, f)
                 end
@@ -20,7 +20,7 @@ fun compute s =
 
 	and COMP (nil, f) = raise SyntaxError
           | COMP (h::t, f) =
-            if f then
+            if f > 0 then
                 if h = "+" then
                     let
                         val (v1,t1, f) = EXP (t, f)
@@ -55,7 +55,7 @@ fun compute s =
             else raise SyntaxError
     and FUNC (nil, f) = raise SyntaxError
           | FUNC (h::t, f) =
-            if f then
+            if f > 0 then
                 if h = "fact" then
                     let
                         val (v, t, f) = EXP (t, f)
@@ -72,8 +72,8 @@ fun compute s =
             else raise SyntaxError
     in
         let
-            val (result,rest, f) = EXP (separate s, false)
+            val (result,rest, f) = EXP (separate s, 0)
         in
-            if rest = nil then result else raise SyntaxError
+            if rest = nil andalso f = 0 then result else raise SyntaxError
         end
     end;
