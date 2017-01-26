@@ -1,10 +1,11 @@
 use "lib.sml";
 
-fun compute s =
+fun compute s mapL =
     let
-	fun EXP (nil, f) = raise SyntaxError
+        fun EXP (nil, f) = raise SyntaxError
           | EXP (h::t, f) =
-            if isInt h then (toInt h, t, f)
+            if isInt h then 
+                (toInt h, t, f)
             else if h = "(" then
                 let
                     val f = f + 1
@@ -14,11 +15,18 @@ fun compute s =
                 in
                     (v1, t2, f)
                 end
-            else if isAlp h then FUNC (h::t, f)
+            else if isAlp h then
+                if h = "fact" orelse h = "fibo" then
+                    FUNC (h::t, f)
+                else
+                    let
+                        val h = findValue h mapL
+                    in
+                        (h, t, f)
+                    end
             else if isOpr h then COMP (h::t, f)
             else raise SyntaxError
-
-	and COMP (nil, f) = raise SyntaxError
+    and COMP (nil, f) = raise SyntaxError
           | COMP (h::t, f) =
             if f > 0 then
                 if h = "+" then
@@ -70,6 +78,11 @@ fun compute s =
                     end
                 else raise SyntaxError
             else raise SyntaxError
+    and findValue s nil = raise NotDefined 
+          | findValue s (h::t : (string*int) list) =
+            if s = (#1 h) then
+                #2 h
+            else findValue s t;
     in
         let
             val (result,rest, f) = EXP (separate s, 0)
