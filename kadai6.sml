@@ -1,21 +1,25 @@
-use "lib.sml";
-
 fun compute s mapL =
     let
         fun EXP (nil, f, b) = raise SyntaxError
           | EXP (h::t, f, b) =
             if isInt h then 
-                (toInt h, t, f, b)
+                if b then
+                    raise SyntaxError
+                else
+                    (toInt h, t, f, b)
             else if h = "(" then
-                let
-                    val f = f + 1
-                    val b = true
-                    val (v1, t1, f, b) = EXP (t, f, b)
-                    val (v2, t2, f, b) = EXP (t1, f, b)
-                    val f = f - 1
-                in
-                    (v1, t2, f, b)
-                end
+                if b then
+                    raise SyntaxError
+                else
+                    let
+                        val f = f + 1
+                        val b = true
+                        val (v1, t1, f, b) = EXP (t, f, b)
+                        val (v2, t2, f, b) = EXP (t1, f, b)
+                        val f = f - 1
+                    in
+                        (v1, t2, f, b)
+                    end
             else if isAlp h then
                 if h = "fact" orelse h = "fibo" then
                     if b then
