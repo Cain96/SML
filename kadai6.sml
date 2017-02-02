@@ -1,6 +1,6 @@
 use "lib.sml";
 
-fun compute s =
+fun compute s mapL =
     let
     fun EXP nil = raise SyntaxError
           | EXP (h::t) =
@@ -13,6 +13,8 @@ fun compute s =
                     FUNC t
                 else
                     raise SyntaxError
+            else if isAlp h then
+                (findValue h mapL, t)
             else raise SyntaxError
 
     and COMP nil = raise SyntaxError
@@ -77,6 +79,11 @@ fun compute s =
                     else raise SyntaxError
             end
         else raise SyntaxError
+    and findValue s nil = raise NotDefined 
+      | findValue s (h::t : (string*int) list) =
+        if s = (#1 h) then
+            #2 h
+        else findValue s t;
     in
         let
             val (result,rest) = EXP (separate s)
