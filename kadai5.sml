@@ -9,6 +9,8 @@ fun compute s =
             else if h = "(" then 
                 if isOpr (hd t) then 
                     COMP t
+                else if isAlp (hd t) then 
+                    FUNC t
                 else
                     raise SyntaxError
             else raise SyntaxError
@@ -56,6 +58,25 @@ fun compute s =
                         raise SyntaxError
                 end
             else raise SyntaxError
+    and FUNC nil = raise SyntaxError
+      | FUNC (h::t) =
+        if h = "fact" then
+            let
+                val (v, t1) = EXP t
+            in
+                if hd t1 = ")" then
+                    (fact v, tl t1)
+                else raise SyntaxError
+            end
+        else if h = "fibo" then
+            let
+                val (v, t1) = EXP t
+            in
+                if hd t1 = ")" then
+                    (fibo v, tl t1)
+                    else raise SyntaxError
+            end
+        else raise SyntaxError
     in
         let
             val (result,rest) = EXP (separate s)
